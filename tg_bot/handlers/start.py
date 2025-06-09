@@ -201,13 +201,13 @@ async def bonus_handler(message: Message, state: FSMContext) -> None:
         elif lang == 'ru':
             await message.answer(text="Пока у нас нет никаких акций 🥲", reply_markup=back('ru'))
         return
-    photo_id = "AgACAgIAAxkBAAM4aEQ1pG7FY9gCbp9sf34BNHHEXWsAAhDyMRtUUylK8yro1OJfs34BAAMCAAN4AAM2BA"
+
     if lang == 'uz':
         for bonus in bonuses:
-            await message.answer_photo(photo=photo_id, caption=bonus.content, reply_markup=back('uz'))
+            await message.answer(text=bonus.content, reply_markup=back('uz'))
     elif lang == 'ru':
         for bonus in bonuses:
-            await message.answer_photo(photo=photo_id, caption=bonus.content_ru, reply_markup=back('ru'))
+            await message.answer( text=bonus.content_ru, reply_markup=back('ru'))
 
 
 @dp.message(StateFilter(MenuState.contact))
@@ -231,11 +231,10 @@ async def rules_handler(message: Message, state: FSMContext) -> None:
     await message.delete()
     data = await state.get_data()
     lang = data.get("lang")
-    photo_id = "AgACAgIAAxkBAAM4aEQ1pG7FY9gCbp9sf34BNHHEXWsAAhDyMRtUUylK8yro1OJfs34BAAMCAAN4AAM2BA"
     if lang == 'uz':
-        await message.answer_photo(photo=photo_id, caption="qoidalar", reply_markup=back('uz'))
+        await message.answer(text="Qoidalar!\n\n1. Kamida 18,9 litr hajmdagi 2 ta kapsulani buyurtma qilish mumkin.\n\n2. Suv kapsulalarini toza va tartibli holda saqlang. Agar kapsula yo‘q qilinsa (utilizatsiya qilinsa), jarima undiriladi.\n\n3. Agar siz yetkazib beruvchi xizmatidan norozi bo‘lsangiz, e’tirozingizni kontakt telefon raqami orqali bildiring.", reply_markup=back('uz'))
     elif lang == 'ru':
-        await message.answer_photo(photo=photo_id, caption="qadada", reply_markup=back('ru'))
+        await message.answer(text="Правила!\n\n1. Можно заказать как минимум 2 капсулы объемом 18,9 л.\n\n2. Содержите емкости с водой в чистоте и порядке. В случае утилизации капсулы взимается штраф.\n\n3. Если вы недовольны услугами поставщика, выскажите свое возражение по контактному телефону.", reply_markup=back('ru'))
 
 
 @dp.callback_query(F.data.startswith("category_"))
@@ -271,12 +270,12 @@ async def category_handler(callback_query: CallbackQuery, state: FSMContext) -> 
     selected_product = callback_query.data.split('product_')[1]
     product = Product.objects.get(id=selected_product)
     if lang == 'uz':
-        await callback_query.message.answer(
-            text=f"◽️ {product.title}\n\n◽️ Narxi: {product.price} so'm\n\n🔻 Mahsulot haqida:\n\n{product.description}\n\n📦 Mahsulotdan nechta olmoqchiligingizni tanlang:",
+        await callback_query.message.answer_photo(photo=product.image,
+            caption=f"◽️ {product.title}\n\n◽️ Narxi: {product.price} so'm\n\n🔻 Mahsulot haqida:\n\n{product.description}\n\n📦 Mahsulotdan nechta olmoqchiligingizni tanlang:",
             reply_markup=quantity_picker(product.id, 'uz'))
     elif lang == 'ru':
-        await callback_query.message.answer(
-            text=f"◽️ {product.title_ru}\n\n◽️ Цена: {product.price} сум\n\n🔻 О продукте:\n\n{product.description_ru}\n\n📦 Выберите количество товара, которое хотите заказать:",
+        await callback_query.message.answer_photo(photo=product.image,
+            caption=f"◽️ {product.title_ru}\n\n◽️ Цена: {product.price} сум\n\n🔻 О продукте:\n\n{product.description_ru}\n\n📦 Выберите количество товара, которое хотите заказать:",
             reply_markup=quantity_picker(product.id, 'ru'))
 
 
