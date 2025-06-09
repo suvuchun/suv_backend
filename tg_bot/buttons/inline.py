@@ -243,4 +243,6 @@ def admin_btn(lang='uz'):
         keyboard = InlineKeyboardMarkup(
             inline_keyboard=[[InlineKeyboardButton(text="Изменить язык 🌐",callback_data="menu_lang")]]
         )
+    else:
+        keyboard=None
     return keyboard
