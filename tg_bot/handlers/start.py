@@ -484,21 +484,17 @@ async def user_number_get(message: Message, state: FSMContext) -> None:
            msg= await message.answer(text="🏠 Введите ваш адрес проживания или воспользуйтесь кнопкой ниже",reply_markup=get_location_keyboard(lang))
     await state.update_data(msg_id=msg.message_id)
     await state.set_state(AskInfo.address)
-    await user_address_get(message,state)
-
     return
 
 @dp.message(StateFilter(AskInfo.address))
 async def user_address_get(message: Message, state: FSMContext) -> None:
     data = await state.get_data()
-    if data.get("msg_id"):
-        await bot.delete_message(chat_id=message.chat.id,message_id=data.get("msg_id"))
-        del data["msg_id"]
-        await state.update_data(**data)
-    if data.get("msg_id1"):
-        await bot.delete_message(chat_id=message.chat.id,message_id=data.get("msg_id1"))
-        del data["msg_id1"]
-        await state.update_data(**data)
+    for key in ["msg_id", "msg_id1"]:
+        if key in data:
+            await bot.delete_message(chat_id=message.chat.id, message_id=data[key])
+            del data[key]
+
+    await state.update_data(**data)
     tg_id=message.from_user.id
     if message.location:
         lat=message.location.latitude
