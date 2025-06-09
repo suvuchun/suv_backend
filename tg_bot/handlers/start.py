@@ -7,7 +7,7 @@ from aiogram.filters.command import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery, ReplyKeyboardRemove
 from aiogram import Bot
-from bot.models import User, Bonus, Order, Product, Cart, CartItem
+from bot.models import User, Bonus, Order, Product, Cart, CartItem, OrderItem
 from tg_bot.buttons.reply import get_contact_keyboard, get_location_keyboard
 from tg_bot.buttons.text import *
 from dispatcher import dp, TOKEN
@@ -695,8 +695,15 @@ async def accept_handler(callback_query: CallbackQuery, state: FSMContext) -> No
     elif lang=='ru':
         await callback_query.message.answer(text="✅ Заказ подтверждён",reply_markup=back(lang))
     user = User.objects.filter(tg_id=tg_id).first()
-    cart= Cart.objects.filter(user=user).first()
-    cart_items=CartItem.objects.filter(cart=cart)
+    cart, _ = Cart.objects.get_or_create(user=user)
+    order, _ = Order.objects.get_or_create(user=user, defaults={'status': 'new'})
+    cart_items = CartItem.objects.filter(cart=cart)
+    for item in cart_items:
+        OrderItem.objects.update_or_create(
+            order=order,
+            product=item.product,
+            defaults={'quantity': item.quantity}
+        )
     admins = User.objects.filter(role="admin")
     for admin in admins:
         text = (
