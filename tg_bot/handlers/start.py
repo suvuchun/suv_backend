@@ -217,12 +217,12 @@ async def contact_handler(message: Message, state: FSMContext) -> None:
     lang = data.get("lang")
     photo_id = "AgACAgIAAxkBAAM4aEQ1pG7FY9gCbp9sf34BNHHEXWsAAhDyMRtUUylK8yro1OJfs34BAAMCAAN4AAM2BA"
     if lang == 'uz':
-        await message.answer_photo(photo=photo_id,
-                                   caption="💧 @aksuu_waterbot -  suv yetkazib berish xizmati\n\nBuyurtma berish uchun: \n\n📦 @aksuu_waterbot\n\nYoki qo'ng;iroq qiling:\n\n📞 +998978667744",
+        await message.answer(
+                                   text="💧 @aksuu_waterbot -  suv yetkazib berish xizmati\n\nBuyurtma berish uchun: \n\n📦 @aksuu_waterbot\n\nYoki qo'ng;iroq qiling:\n\n📞 +998978667744",
                                    reply_markup=back('uz'))
     elif lang == 'ru':
-        await message.answer_photo(photo=photo_id,
-                                   caption="💧 @aksuu_waterbot -  служба доставки воды\n\nНапишите для заказа на: \n\n📦 @aksuu_waterbot\n\nИли позвоните:\n\n📞 +998978667744",
+        await message.answer(
+                                   text="💧 @aksuu_waterbot -  служба доставки воды\n\nНапишите для заказа на: \n\n📦 @aksuu_waterbot\n\nИли позвоните:\n\n📞 +998978667744",
                                    reply_markup=back('ru'))
 
 
@@ -270,11 +270,11 @@ async def category_handler(callback_query: CallbackQuery, state: FSMContext) -> 
     selected_product = callback_query.data.split('product_')[1]
     product = Product.objects.get(id=selected_product)
     if lang == 'uz':
-        await callback_query.message.answer_photo(photo=product.image,
+        await callback_query.message.answer_photo(photo=product.image_url,
             caption=f"◽️ {product.title}\n\n◽️ Narxi: {product.price} so'm\n\n🔻 Mahsulot haqida:\n\n{product.description}\n\n📦 Mahsulotdan nechta olmoqchiligingizni tanlang:",
             reply_markup=quantity_picker(product.id, 'uz'))
     elif lang == 'ru':
-        await callback_query.message.answer_photo(photo=product.image,
+        await callback_query.message.answer_photo(photo=product.image_url,
             caption=f"◽️ {product.title_ru}\n\n◽️ Цена: {product.price} сум\n\n🔻 О продукте:\n\n{product.description_ru}\n\n📦 Выберите количество товара, которое хотите заказать:",
             reply_markup=quantity_picker(product.id, 'ru'))
 

@@ -45,6 +45,7 @@ class Product(models.Model):
     def image_url(self):
         if self.image:
             return f"https://suvbackend-production.up.railway.app/{self.image.url}"
+
         return '/static/images/no-image.jpg'
     def __str__(self):
         return self.title
