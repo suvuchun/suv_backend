@@ -489,7 +489,7 @@ async def user_number_get(message: Message, state: FSMContext) -> None:
 @dp.message(StateFilter(AskInfo.address))
 async def user_address_get(message: Message, state: FSMContext) -> None:
     data = await state.get_data()
-    await message.delete()
+
     if data.get("msg_id"):
         await bot.delete_message(chat_id=message.chat.id,message_id=data.get("msg_id"))
         del data["msg_id"]
@@ -507,6 +507,7 @@ async def user_address_get(message: Message, state: FSMContext) -> None:
         user=User.objects.filter(tg_id=tg_id).first()
         user.address=location
         user.save()
+    await message.delete()
     await state.set_state(AskInfo.bottle)
     await adreess_handler_message(message,state)
     return
