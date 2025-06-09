@@ -411,6 +411,7 @@ async def user_number_get(message: Message, state: FSMContext) -> None:
     if data.get("msg_id"):
         await bot.delete_message(chat_id=message.chat.id,message_id=data.get("msg_id"))
         del data["msg_id"]
+        await state.update_data(**data)
     await message.delete()
     tg_id=message.from_user.id
     msg1=await message.answer(text="🚚",reply_markup=ReplyKeyboardRemove())
@@ -489,13 +490,14 @@ async def user_number_get(message: Message, state: FSMContext) -> None:
 @dp.message(StateFilter(AskInfo.address))
 async def user_address_get(message: Message, state: FSMContext) -> None:
     data = await state.get_data()
-
     if data.get("msg_id"):
         await bot.delete_message(chat_id=message.chat.id,message_id=data.get("msg_id"))
         del data["msg_id"]
+        await state.update_data(**data)
     if data.get("msg_id1"):
         await bot.delete_message(chat_id=message.chat.id,message_id=data.get("msg_id1"))
         del data["msg_id1"]
+        await state.update_data(**data)
     tg_id=message.from_user.id
     if message.location:
         lat=message.location.latitude
@@ -521,6 +523,7 @@ async def adreess_handler_callback(callback_query: CallbackQuery, state: FSMCont
     if data.get("msg_id1"):
         await bot.delete_message(chat_id=callback_query.message.chat.id,message_id=data.get("msg_id1"))
         del data["msg_id1"]
+        await state.update_data(**data)
     lang = data.get("lang")
     total=data.get("total")
     location=data.get("location")
@@ -550,7 +553,6 @@ async def adreess_handler_message(message: Message, state: FSMContext) -> None:
 
     data = await state.get_data()
     lang = data.get("lang")
-    tg_id = data.get("tg_id")
     total=data.get("total")
     location=data.get("location")
     phone_number=data.get("phone_number")
