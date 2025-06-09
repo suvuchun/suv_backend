@@ -1,0 +1,9 @@
+ortga = "🔙 Ortga"
+menuga_uz='🔙 Asosiy menu qaytish'
+menuga_ru='🔙 Главное меню'
+nazad = "🔙 Назад"
+uz_text = "🇺🇿 O'zbek"
+ru_text = "🇷🇺 Русский"
+en_text="🇺🇸 English"
+admin_txt="admin_parol"
+user_txt="user_parol"
