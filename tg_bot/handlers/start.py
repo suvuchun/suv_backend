@@ -270,12 +270,12 @@ async def category_handler(callback_query: CallbackQuery, state: FSMContext) -> 
     selected_product = callback_query.data.split('product_')[1]
     product = Product.objects.get(id=selected_product)
     if lang == 'uz':
-        await callback_query.message.answer_photo(photo=product.image_url,
-            caption=f"◽️ {product.title}\n\n◽️ Narxi: {product.price} so'm\n\n🔻 Mahsulot haqida:\n\n{product.description}\n\n📦 Mahsulotdan nechta olmoqchiligingizni tanlang:",
+        await callback_query.message.answer(
+            text=f"◽️ {product.title}\n\n◽️ Narxi: {product.price} so'm\n\n🔻 Mahsulot haqida:\n\n{product.description}\n\n📦 Mahsulotdan nechta olmoqchiligingizni tanlang:",
             reply_markup=quantity_picker(product.id, 'uz'))
     elif lang == 'ru':
-        await callback_query.message.answer_photo(photo=product.image_url,
-            caption=f"◽️ {product.title_ru}\n\n◽️ Цена: {product.price} сум\n\n🔻 О продукте:\n\n{product.description_ru}\n\n📦 Выберите количество товара, которое хотите заказать:",
+        await callback_query.message.answer(
+            text=f"◽️ {product.title_ru}\n\n◽️ Цена: {product.price} сум\n\n🔻 О продукте:\n\n{product.description_ru}\n\n📦 Выберите количество товара, которое хотите заказать:",
             reply_markup=quantity_picker(product.id, 'ru'))
 
 
