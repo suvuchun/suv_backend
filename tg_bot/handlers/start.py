@@ -482,9 +482,10 @@ async def user_number_get(message: Message, state: FSMContext) -> None:
             msg=await message.answer(text="🏠 Yashash mazilingizni kiriting yoki pasdagi tugmadan foydalaning",reply_markup=get_location_keyboard(lang))
         elif lang == 'ru':
            msg= await message.answer(text="🏠 Введите ваш адрес проживания или воспользуйтесь кнопкой ниже",reply_markup=get_location_keyboard(lang))
+    await state.update_data(msg_id=msg.message_id)
     await state.set_state(AskInfo.address)
     await user_address_get(message,state)
-    await state.update_data(msg_id=msg.message_id)
+
     return
 
 @dp.message(StateFilter(AskInfo.address))
