@@ -25,8 +25,8 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['https://suvbackend-production.up.railway.app']
-CSRF_TRUSTED_ORIGINS = ALLOWED_HOSTS
+ALLOWED_HOSTS = ['suvbackend-production.up.railway.app']
+CSRF_TRUSTED_ORIGINS = ['https://suvbackend-production.up.railway.app']
 # Application definition
 
 INSTALLED_APPS = [
