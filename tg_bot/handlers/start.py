@@ -456,11 +456,8 @@ async def category_handler(callback_query: CallbackQuery, state: FSMContext) -> 
 async def user_number_get(message: Message, state: FSMContext) -> None:
     phone_number = None
     data = await state.get_data()
-    if data.get("msg_id"):
-        await bot.delete_message(chat_id=message.chat.id,message_id=data.get("msg_id"))
-        del data["msg_id"]
-        await state.update_data(**data)
-    await message.delete()
+
+
     tg_id=message.from_user.id
     msg1=await message.answer(text="🚚",reply_markup=ReplyKeyboardRemove())
     await state.update_data(msg_id1=msg1.message_id)
@@ -482,8 +479,8 @@ async def user_number_get(message: Message, state: FSMContext) -> None:
                 reply_markup=get_contact_keyboard(lang)
 
             )
+
         await state.set_state(AskInfo.get_number)
-        await user_number_get(message, state)
         return
     await state.update_data(phone_number=phone_number)
     user = User.objects.filter(tg_id=tg_id).first()
