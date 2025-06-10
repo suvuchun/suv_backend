@@ -65,7 +65,7 @@ def get_accept(lang='uz'):
 
 def get_count(lang='uz'):
     builder = InlineKeyboardBuilder()
-    for i in range(1, 10):
+    for i in range(3, 12):
         builder.button(
             text=str(i),
             callback_data=f"bottle_{i}"
