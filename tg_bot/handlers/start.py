@@ -215,7 +215,6 @@ async def contact_handler(message: Message, state: FSMContext) -> None:
     await message.delete()
     data = await state.get_data()
     lang = data.get("lang")
-    photo_id = "AgACAgIAAxkBAAM4aEQ1pG7FY9gCbp9sf34BNHHEXWsAAhDyMRtUUylK8yro1OJfs34BAAMCAAN4AAM2BA"
     if lang == 'uz':
         await message.answer(
                                    text="💧 @aksuu_waterbot -  suv yetkazib berish xizmati\n\nBuyurtma berish uchun: \n\n📦 @aksuu_waterbot\n\nYoki qo'ng;iroq qiling:\n\n📞 +998978667744",
@@ -279,6 +278,48 @@ async def category_handler(callback_query: CallbackQuery, state: FSMContext) -> 
             reply_markup=quantity_picker(product.id, 'ru'))
 
 
+@dp.message(StateFilter(MenuState.quantity))
+async def quan_handler(message: Message, state: FSMContext) -> None:
+    data = await state.get_data()
+    if data.get("msg_id"):
+        await bot.delete_message(chat_id=data.get("tg_id"), message_id=data.get("msg_id"))
+        del data['msg_id']
+        await state.update_data(data=data)
+    lang = data.get("lang")
+    tg_id = data.get("tg_id")
+    product_id = int(data.get("product_id"))
+    quantity = int(message.text)
+    user = User.objects.filter(tg_id=tg_id).first()
+    cart, _ = Cart.objects.get_or_create(user=user)
+    cart_item, created = CartItem.objects.update_or_create(
+        cart=cart,
+        product_id=product_id,
+        defaults={'quantity': quantity}
+    )
+    product = Product.objects.get(id=product_id)
+    await message.delete()
+    if created:
+        cart_item.quantity = quantity
+        if lang == 'uz':
+            await message.answer(
+                text=f"🛒 Savatga qo‘shildi!\n\n🔤 {product.title}\n\n💵 Jami narx:\n\n{quantity} x {product.price} so'm = {quantity * product.price} so'm",
+                reply_markup=cart_order('uz'))
+        elif lang == 'ru':
+            await message.answer(
+                text=f"🛒 Добавлено в корзину!\n\n🔤 {product.title}\n\n💵 Общая стоимость:\n\n{quantity} x {product.price} сум = {quantity * product.price} сум",
+                reply_markup=cart_order('ru'))
+    else:
+        cart_item.quantity += quantity
+        if lang == 'uz':
+            await message.answer(
+                text=f"🛒 Savatga yangilandi:\n\n🔤 {product.title}\n\nMahsulot {quantity} taga oshirildi\n\n💵 Jami narx:\n\n{cart_item.quantity} x {product.price} so'm = {cart_item.quantity * product.price} so'm",
+                reply_markup=cart_order('uz'))
+        elif lang == 'ru':
+            await message.answer(
+                text=f"🛒 Корзина обновлена:\n\n🔤 {product.title}\n\nКоличество товара увеличено на {quantity} шт.\n\n💵 Общая стоимость:\n\n{cart_item.quantity} x {product.price} сум = {cart_item.quantity * product.price} сум",
+                reply_markup=cart_order('ru'))
+    cart_item.save()
+
 @dp.callback_query(F.data.startswith("quantity_"))
 async def category_handler(callback_query: CallbackQuery, state: FSMContext) -> None:
     await callback_query.answer()
@@ -288,7 +329,15 @@ async def category_handler(callback_query: CallbackQuery, state: FSMContext) -> 
 
     await callback_query.message.delete()
     _, product_id, quantity = callback_query.data.split("_")
-
+    if quantity=="hande":
+        if lang == 'uz':
+            msg=await callback_query.message.answer(text="📶 Miqdorni kiriting")
+        elif lang == 'ru':
+            msg=await callback_query.message.answer(text="📶 Введите количество")
+        await state.update_data(msg_id=msg.message_id)
+        await state.update_data(product_id=product_id)
+        await state.set_state(MenuState.quantity)
+        return
     product_id = int(product_id)
     quantity = int(quantity)
     user = User.objects.filter(tg_id=tg_id).first()
@@ -420,11 +469,8 @@ async def user_number_get(message: Message, state: FSMContext) -> None:
 
     elif message.text and re.match(r"^\+\d{9,13}$", message.text):
         phone_number = format_phone_number(message.text)
-
-
     lang = data.get("lang")
     total=data.get("total")
-    await state.update_data(phone_number=phone_number)
     if not phone_number:
         if lang == 'uz':
             await message.answer(
@@ -436,7 +482,10 @@ async def user_number_get(message: Message, state: FSMContext) -> None:
                 reply_markup=get_contact_keyboard(lang)
             )
         return
+    await state.update_data(phone_number=phone_number)
     user = User.objects.filter(tg_id=tg_id).first()
+    user.user_number=phone_number
+    user.save()
     if not user:
         user = User.objects.create(
             tg_id=tg_id,
@@ -496,9 +545,14 @@ async def user_address_get(message: Message, state: FSMContext) -> None:
     await state.update_data(**data)
     tg_id=message.from_user.id
     if message.location:
+        user = User.objects.filter(tg_id=tg_id).first()
         lat=message.location.latitude
         lon=message.location.longitude
+        user.lat=lat
+        user.lon=lon
+        user.save()
         await state.update_data(lat=lat,lon=lon)
+
     else:
         location = message.text
         await state.update_data(location=location)
@@ -580,10 +634,17 @@ async def bottle_handler(callback_query: CallbackQuery, state: FSMContext) -> No
     cart_data = callback_query.data.split('bottle_')[1]
     await state.update_data(cart_data=cart_data)
     lang = data.get("lang")
-    tg_id = data.get("tg_id")
     total=data.get("total")
-    location=data.get("location")
     phone_number=data.get("phone_number")
+    if cart_data=="hande":
+
+        if lang == 'uz':
+            msg = await callback_query.message.answer(text="📶 Miqdorni kiriting")
+        elif lang == 'ru':
+            msg = await callback_query.message.answer(text="📶 Введите количество")
+            await state.update_data(msg_id=msg.message_id)
+        await state.set_state(MenuState.quantity_bottle)
+        await handler_message(callback_query.message,state)
     if lang=='uz':
         text_uz = (
             "🚖 Buyurtma:\n\n"
@@ -613,6 +674,51 @@ async def bottle_handler(callback_query: CallbackQuery, state: FSMContext) -> No
     await state.set_state(AskInfo.note)
     await note_take_handler(callback_query.message,state)
 
+@dp.message(StateFilter(MenuState.quantity_bottle))
+async def handler_message(message: Message, state: FSMContext) -> None:
+    data = await state.get_data()
+    await message.delete()
+    cart_data =message.text if message.text.isdigit() else None
+    await state.update_data(cart_data=cart_data)
+    lang = data.get("lang")
+    if cart_data is None:
+        if lang=='uz':
+            await message.answer(text="Faqat son kiriting 📶")
+        elif lang == 'ru':
+            await message.answer(text="Введите только число 📶")
+        await state.set_state(MenuState.quantity_bottle)
+        return
+    total = data.get("total")
+    phone_number = data.get("phone_number")
+    if lang == 'uz':
+        text_uz = (
+            "🚖 Buyurtma:\n\n"
+            f"Buyurtma narxi: {total}\n"
+            f"Telefon: {phone_number}\n"
+            "Manzil: ✅\n"
+            f"Qaytariladigan kapsulalar soni: {cart_data}\n\n"
+            "📝 Agar qo‘shimcha izohingiz bo‘lsa, yozing\n"
+            "(Masalan: Men soat 18:00 dan keyin uyda bo‘laman)\n\n"
+            "⁉️ Agar izoh yo‘q bo‘lsa, «Izohsiz» tugmasini bosing"
+        )
+        msg = await message.answer(text=text_uz, reply_markup=get_note(lang))
+        await state.update_data(msg_id=msg.message_id)
+    elif lang == 'ru':
+        text_ru = (
+            "🚖 Заказать:\n\n"
+            f"Стоимость заказа: {total} сўм\n"
+            f"Телефон: {phone_number}\n"
+            f"Адрес: ✅\n"
+            f"Количество возвратных капсул: {cart_data}\n\n"
+            "📝 Напишите, если есть дополнительный комментарий\n"
+            "(Пример: я буду дома после 18:00)\n\n"
+            "⁉️ Если комментариев нет, нажмите «Без комментариев»"
+        )
+        msg = await message.answer(text=text_ru, reply_markup=get_note(lang))
+        await state.update_data(msg_id=msg.message_id)
+    await state.set_state(AskInfo.note)
+    await note_take_handler(message, state)
+
 @dp.message(StateFilter(AskInfo.note))
 async def note_take_handler(message: Message, state: FSMContext) -> None:
     data = await state.get_data()
@@ -635,6 +741,7 @@ async def note_take_handler(message: Message, state: FSMContext) -> None:
             f"Qaytadigan idishlar soni: {cart_data}\n"
             f"Izoh: {message.text}"
         )
+        await state.update_data(note=message.text)
         await message.answer(text=text_uz, reply_markup=get_accept(lang))
     elif lang == 'ru':
         text_ru = (
@@ -645,6 +752,7 @@ async def note_take_handler(message: Message, state: FSMContext) -> None:
             f"Количество возвратных капсул: {cart_data}\n"
             f"Комментарий: {message.text}"
         )
+        await state.update_data(note=message.text)
         await message.answer(text=text_ru, reply_markup=get_accept(lang))
 
 
@@ -689,6 +797,7 @@ async def accept_handler(callback_query: CallbackQuery, state: FSMContext) -> No
     total=data.get("total")
     location=data.get("location")
     phone_number=data.get("phone_number")
+    note=data.get("note")
     cart_data=data.get("cart_data")
     if lang=='uz':
         await callback_query.message.answer(text="✅ Buyurtma tasdiqlandi",reply_markup=back(lang))
@@ -716,8 +825,10 @@ async def accept_handler(callback_query: CallbackQuery, state: FSMContext) -> No
             text+= f"🍾 Bo'sh idishlar {cart_data} ta"
 
         text += f"\n📍 Manzil: {location}\n"
-
+        text += f"\n⁉️ Izoh: {note}\n"
         await bot.send_message(chat_id=admin.tg_id, text=text)
+        if user.lat and user.lon:
+            await bot.send_location(chat_id=admin.tg_id, latitude=user.lat, longitude=user.lon)
     cart_jon = Cart.objects.filter(user=user)
     cart_jon.delete()
     await state.clear()

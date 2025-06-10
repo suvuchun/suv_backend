@@ -11,6 +11,8 @@ class MenuState(StatesGroup):
     rules=State()
     categories=State()
     basked=State()
+    quantity=State()
+    quantity_bottle=State()
 
 class AskInfo(StatesGroup):
     get_number = State()

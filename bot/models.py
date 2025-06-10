@@ -20,6 +20,8 @@ class User(models.Model):
     address=models.CharField(max_length=255,null=True,blank=True)
     user_number=models.CharField(null=True,blank=True,max_length=13)
     lang=models.CharField(max_length=2,choices=LANG_CHOICES,null=True,blank=True)
+    lat=models.FloatField(null=True,blank=True)
+    lon=models.FloatField(null=True,blank=True)
 
     def __str__(self):
         return self.lang

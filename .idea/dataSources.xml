@@ -58,5 +58,12 @@
         </library>
       </libraries>
     </data-source>
+    <data-source source="LOCAL" name="railway@centerbeam.proxy.rlwy.net" uuid="9f4bc54f-696a-493f-a196-0d6585ba5712">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://centerbeam.proxy.rlwy.net:33382/railway</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>

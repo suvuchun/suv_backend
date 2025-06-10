@@ -72,15 +72,20 @@ def get_count(lang='uz'):
         )
     if lang == 'uz':
         keyboard = InlineKeyboardButton(text="🅾️ Idishlar yo'q", callback_data="bottle_0")
-        keyboard2 = InlineKeyboardButton(text=ortga, callback_data="back")
+        keyboard1 = InlineKeyboardButton(text=ortga, callback_data="back")
+        keyboard2 = InlineKeyboardButton(text="Qolda kiritish ✍️", callback_data=f"bottle_hande")
+
         builder.add(keyboard)
-        builder.add(keyboard2)
+        builder.add(keyboard1)
     elif lang == 'ru':
         keyboard = InlineKeyboardButton(text="🅾️ Нет капсул", callback_data="bottle_0")
         keyboard1 = InlineKeyboardButton(text=nazad, callback_data="back")
+        keyboard2 = InlineKeyboardButton(text="Ввести вручную ✍️", callback_data=f"bottle_hande")
         builder.add(keyboard)
         builder.add(keyboard1)
+
     builder.adjust(3)
+    builder.add(keyboard2)
     return builder.as_markup()
 
 
@@ -139,10 +144,15 @@ def quantity_picker(product_id, lang='uz'):
             callback_data=f"quantity_{product_id}_{i}"
         )
     if lang == 'uz':
+        keyboard1=InlineKeyboardButton(text="Qolda kiritish ✍️",callback_data=f"quantity_{product_id}_hande")
         keyboard = InlineKeyboardButton(text=ortga, callback_data="back")
+
+        builder.add(keyboard1)
         builder.add(keyboard)
     elif lang == 'ru':
+        keyboard1 = InlineKeyboardButton(text="Ввести вручную ✍️", callback_data=f"quantity_{product_id}_hande")
         keyboard = InlineKeyboardButton(text=nazad, callback_data="back")
+        builder.add(keyboard1)
         builder.add(keyboard)
     builder.adjust(3)
     return builder.as_markup()
