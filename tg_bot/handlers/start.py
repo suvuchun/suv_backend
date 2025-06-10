@@ -446,7 +446,7 @@ async def category_handler(callback_query: CallbackQuery, state: FSMContext) -> 
         if lang == 'uz':
             await callback_query.message.answer(text="Savatcha tozalandi ✅")
         elif lang == 'ru':
-            await callback_query.message.answer(text="Корзина очищена ✅")
+            await callback_query.message.answer(text=" Корзина очищена ✅")
         await state.set_state(MenuState.menu)
         await menu_handler(callback_query.message, state)
         return
