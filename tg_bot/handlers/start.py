@@ -217,7 +217,7 @@ async def contact_handler(message: Message, state: FSMContext) -> None:
     lang = data.get("lang")
     if lang == 'uz':
         await message.answer(
-                                   text="💧 @aksuu_waterbot -  suv yetkazib berish xizmati\n\nBuyurtma berish uchun: \n\n📦 @aksuu_waterbot\n\nYoki qo'ng;iroq qiling:\n\n📞 +998978667744",
+                                   text="💧 @aksuu_waterbot -  suv yetkazib berish xizmati\n\nBuyurtma berish uchun: \n\n📦 @aksuu_waterbot\n\nYoki qo'ng'iroq qiling:\n\n📞 +998978667744",
                                    reply_markup=back('uz'))
     elif lang == 'ru':
         await message.answer(
