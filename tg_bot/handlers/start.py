@@ -480,7 +480,9 @@ async def user_number_get(message: Message, state: FSMContext) -> None:
             await message.answer(
                 "📱 Введите свой номер телефона в формате +998991234567 или нажмите кнопку «Отправить номер» ниже.",
                 reply_markup=get_contact_keyboard(lang)
+
             )
+        await state.set_state(AskInfo.get_number)
         return
     await state.update_data(phone_number=phone_number)
     user = User.objects.filter(tg_id=tg_id).first()
